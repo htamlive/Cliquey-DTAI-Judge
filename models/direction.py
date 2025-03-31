@@ -46,11 +46,11 @@ class Direction(Enum):
         """
         direction_to_coordinate = {
             Direction.O: (0, 0, 0),
-            Direction.E: (1, -1, 0),
-            Direction.NE: (1, 0, -1),
-            Direction.NW: (0, 1, -1),
-            Direction.W: (-1, 1, 0),
-            Direction.SW: (-1, 0, 1),
-            Direction.SE: (0, -1, 1),
+            Direction.E: (1, 0, -1),
+            Direction.NE: (1, -1, 0),
+            Direction.NW: (0, -1, 1),
+            Direction.W: (-1, 0, 1),
+            Direction.SW: (-1, 1, 0),
+            Direction.SE: (0, 1, -1),
         }
         return direction_to_coordinate[self]

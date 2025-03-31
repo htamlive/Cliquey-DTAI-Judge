@@ -38,7 +38,7 @@ class GameState:
             if player.alive and moves[i]:
                 direction = moves[i].direction
                 if direction:
-                    player.move(direction)
+                    player.move(direction, self.map)
 
     def to_json(self) -> str:
         """

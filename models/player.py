@@ -8,6 +8,7 @@ import math
 
 from models.coordinate import Coordinate
 from models.direction import Direction
+from models.map import Map
 from utils.constants import MISSILE_DAMAGE_ONE, MISSILE_DAMAGE_TWO
 
 
@@ -32,7 +33,7 @@ class Player:
         self.missiles = missiles
         self.missiles_fired = []
 
-    def move(self, direction: Direction):
+    def move(self, direction: Direction, map: 'Map'):
         """
         Move the player in the specified direction.
         
@@ -45,7 +46,9 @@ class Player:
         # Store previous position before moving
         self.previous_position = Coordinate(self.position.q, self.position.r, self.position.s)
 
-        self.position = self.position.next(direction)
+        new_position = self.position.next(direction)
+        if map.is_valid_coordinate(new_position):
+            self.position = new_position
 
     def fire_missile(self, target: Coordinate) -> bool:
         """
