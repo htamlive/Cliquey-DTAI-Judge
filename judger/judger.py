@@ -468,6 +468,10 @@ class Judger:
                 if cell.is_empty() or isinstance(cell.get_item(), Gold) or isinstance(cell.get_item(), Treasure):
                     valid_cells.append(new_coord)
 
+        # If no valid cells, return
+        if not valid_cells:
+            return
+
         # Distribute gold to valid cells
         for coord in random.choices(valid_cells, k=gold_amount):
             cell = self.game_state.map.get_cell(coord)
