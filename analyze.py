@@ -1,16 +1,18 @@
 import json
 from pathlib import Path
 import pandas as pd
+import argparse
+from tqdm import tqdm
 
-TREASURE_VALUE_DIVISOR = 15
 
-bot_match_path = Path(r'F:\Cliquey\DTAI-Judge\data\logs\bot4_vs_bot6_vs_bot11.json')
 
-bot_match_logs_json = json.loads(bot_match_path.read_text(encoding='utf-8'))
+TREASURE_VALUE_DIVISOR = 12
 
-first_round_log = bot_match_logs_json[0]
-
-final_round_log = bot_match_logs_json[-1]
+def parse_args():
+    parser = argparse.ArgumentParser(description="Analyze bot match logs")
+    parser.add_argument("--bot_matchs_json_dir_path", type=str, help="Path to the directory containing bot match logs in JSON format")
+    parser.add_argument("--output_dir_path", type=str, help="Path to the output directory for the analysis results")
+    return parser.parse_args()
 
 def get_scores(round_log):
     players = round_log['players']
@@ -108,27 +110,46 @@ def get_missile_accuracy(bot_match_logs_json):
     return hit_missles, fired_missles
 
 
+def bot_match_analysis(bot_match_path: Path) -> pd.DataFrame:
+    
+    bot_match_logs_json = json.loads(bot_match_path.read_text(encoding='utf-8'))
 
-final_scores = get_scores(final_round_log)
-winners = get_winners(final_round_log)
-
-who_got_treasure = get_who_got_treasure(bot_match_logs_json)
-hit_missles, fired_missles = get_missile_accuracy(bot_match_logs_json)
-
-winners_hot_encoded = [1 if i in winners else 0 for i in range(len(final_scores))]
-who_got_treasure_hot_encoded = [1 if i == who_got_treasure else 0 for i in range(len(final_scores))]
-print(who_got_treasure)
-print(winners)
+    final_round_log = bot_match_logs_json[-1]
 
 
-df = pd.DataFrame({
-    'player': ['bot4', 'bot6', 'bot11'],
-    'final_score': final_scores,
-    'winner': winners_hot_encoded,
-    'who_got_treasure': who_got_treasure_hot_encoded,
-    'missile_hit': hit_missles,
-    'missile_fired': fired_missles
-})
-df['missile_accuracy'] = df['missile_hit'] / df['missile_fired']
+    final_scores = get_scores(final_round_log)
+    winners = get_winners(final_round_log)
 
-df.to_csv('bot_match_analysis.csv', index=False)
+    who_got_treasure = get_who_got_treasure(bot_match_logs_json)
+    hit_missles, fired_missles = get_missile_accuracy(bot_match_logs_json)
+
+    winners_hot_encoded = [1 if i in winners else 0 for i in range(len(final_scores))]
+    who_got_treasure_hot_encoded = [1 if i == who_got_treasure else 0 for i in range(len(final_scores))]
+
+    df = pd.DataFrame({
+        'player': ['bot4', 'bot6', 'bot11'],
+        'final_score': final_scores,
+        'winner': winners_hot_encoded,
+        'who_got_treasure': who_got_treasure_hot_encoded,
+        'missile_hit': hit_missles,
+        'missile_fired': fired_missles
+    })
+    df['missile_accuracy'] = df['missile_hit'] / df['missile_fired']
+
+    return df
+
+if __name__ == "__main__":
+    args = parse_args()
+    bot_matchs_json_dir_path = Path(args.bot_matchs_json_dir_path)
+    
+    output_dir_path = Path(args.output_dir_path)
+    output_dir_path.mkdir(parents=True, exist_ok=True)
+
+    bot_matche_paths = list(bot_matchs_json_dir_path.glob('*.json'))
+
+    for bot_match_path in tqdm(bot_matche_paths, desc="Analyzing bot match logs"):
+
+        df = bot_match_analysis(bot_match_path)
+
+        save_path = output_dir_path / f"{bot_match_path.stem}_analysis.csv"
+        df.to_csv(save_path, index=False)

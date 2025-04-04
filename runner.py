@@ -3,6 +3,7 @@
 Runner module for orchestrating the "botwar ship" game.
 """
 import os
+from pathlib import Path
 import subprocess
 import logging
 from typing import List, Dict, Any
@@ -120,13 +121,27 @@ class Runner:
                 f.write(input_data)
 
             # Execute the agent with the input file
-            result = subprocess.run(
-                [agent_path, input_file],
-                cwd=agent_dir,
-                capture_output=True,
-                text=True,
-                timeout=TIMEOUT
-            )
+
+            ext = os.path.splitext(agent_path)[1]
+
+            if ext == "" or ext == ".exe":
+ 
+                result = subprocess.run(
+                    [agent_path, input_file],
+                    cwd=agent_dir,
+                    capture_output=True,
+                    text=True,
+                    timeout=TIMEOUT
+                )
+
+            else:
+                result = subprocess.run(
+                    ["python", agent_path, input_file],
+                    cwd=agent_dir,
+                    capture_output=True,
+                    text=True,
+                    timeout=TIMEOUT
+                )
 
             if result.returncode != 0:
                 self.logger.error(f"Agent execution failed: {result.stderr}")
