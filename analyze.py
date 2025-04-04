@@ -127,7 +127,7 @@ def bot_match_analysis(bot_match_path: Path) -> pd.DataFrame:
     who_got_treasure_hot_encoded = [1 if i == who_got_treasure else 0 for i in range(len(final_scores))]
 
     df = pd.DataFrame({
-        'player': ['bot4', 'bot6', 'bot11'],
+        'player': ['bot1', 'bot2', 'bot3'],
         'final_score': final_scores,
         'winner': winners_hot_encoded,
         'who_got_treasure': who_got_treasure_hot_encoded,
