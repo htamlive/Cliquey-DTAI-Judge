@@ -11,3 +11,4 @@ agent/main
 examples/agents/*/MAP.INP
 examples/agents/*/ACT.OUT
 examples/agents/*/*.spec
+playground/
